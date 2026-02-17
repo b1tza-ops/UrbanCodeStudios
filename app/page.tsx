@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent, ChangeEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 
 interface FormErrors {
   name?: string;
@@ -54,7 +54,9 @@ export default function Home() {
       errors.email = "Please enter a valid email address";
     }
 
-    if (!phone || !/^(\+44\s?|0)(\d\s?){9,10}$/.test(phone.replace(/[\s()-]/g, ''))) {
+    // UK phone number validation - accepts formats like: 07XXX XXXXXX, +447XXX XXXXXX, +44 7XXX XXXXXX
+    const cleanPhone = phone.replace(/[\s()-]/g, '');
+    if (!phone || !/^(\+?44|0)7\d{9}$/.test(cleanPhone)) {
       errors.phone = "Please enter a valid UK phone number";
     }
 

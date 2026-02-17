@@ -80,7 +80,6 @@ export default function RootLayout({
           id="structured-data"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-          strategy="beforeInteractive"
         />
         {children}
       </body>
