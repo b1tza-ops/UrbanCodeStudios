@@ -9,6 +9,9 @@ interface FormErrors {
   business?: string;
 }
 
+// Simulated API call delay for demo purposes
+const FORM_SUBMISSION_DELAY_MS = 1000;
+
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -54,7 +57,10 @@ export default function Home() {
       errors.email = "Please enter a valid email address";
     }
 
-    // UK phone number validation - accepts formats like: 07XXX XXXXXX (11 digits total)
+    // UK mobile phone validation
+    // Format: 07XXXXXXXXX (11 digits) or +447XXXXXXXXX (11 digits with country code)
+    // Regex: ^(0)7\d{9}$ matches 0 + 7 + 9 digits = 11 total
+    // Regex: ^(\+44)7\d{9}$ matches +44 + 7 + 9 digits = 11 digit number
     const cleanPhone = phone.replace(/[\s()-]/g, '');
     if (!phone || !/^(\+44|0)7\d{9}$/.test(cleanPhone)) {
       errors.phone = "Please enter a valid UK mobile number";
@@ -82,7 +88,7 @@ export default function Home() {
     }
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, FORM_SUBMISSION_DELAY_MS));
 
     setShowSuccessMessage(true);
     setIsSubmitting(false);
