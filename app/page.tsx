@@ -5,7 +5,6 @@ import { useState, useEffect, FormEvent } from "react";
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
 
   useEffect(() => {
     const observerOptions = {
