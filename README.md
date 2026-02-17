@@ -10,6 +10,7 @@ A production-ready marketing website for UrbanCode Studio, a web design agency t
 - **Accessible**: ARIA labels and semantic HTML for better accessibility
 - **Interactive**: Smooth scrolling, active navigation highlighting, and form validation
 - **Performance Optimized**: Fast loading with Next.js optimization
+- **Docker Ready**: Containerized for easy deployment
 
 ## 🎨 Design
 
@@ -31,7 +32,7 @@ A production-ready marketing website for UrbanCode Studio, a web design agency t
 9. **Contact Form** - Lead capture with validation and success message
 10. **Footer** - Quick links, legal, and location information
 
-## 🛠️ Installation
+## 🛠️ Local Development
 
 ```bash
 # Install dependencies
@@ -47,23 +48,88 @@ npm run build
 npm start
 ```
 
-## 📱 Development
-
 The development server will start at `http://localhost:3000`.
 
-### Project Structure
+## 🐳 Docker Deployment
+
+### Quick Start with Docker
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop containers
+docker-compose down
+```
+
+### Build Docker Image Manually
+
+```bash
+# Build the image
+docker build -t urbancodestudio .
+
+# Run the container
+docker run -p 3000:3000 urbancodestudio
+```
+
+## ☁️ Google Cloud VM Deployment
+
+For detailed instructions on deploying to Google Cloud VM, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+
+### Quick Deployment Steps:
+
+1. **Create a Google Cloud VM** (Ubuntu 22.04, e2-small recommended)
+2. **SSH into your VM**
+3. **Run setup script**:
+   ```bash
+   sudo ./setup-vm.sh
+   ```
+4. **Configure and deploy**:
+   ```bash
+   cp .env.example .env
+   ./deploy.sh
+   ```
+5. **Configure Nginx** (see DEPLOYMENT.md for details)
+
+## 📱 Project Structure
+
 ```
 ├── app/
+│   ├── about/           # About page
+│   ├── faqs/            # FAQs with accordion
+│   ├── privacy/         # Privacy policy
+│   ├── terms/           # Terms of service
 │   ├── globals.css      # Global styles and Tailwind directives
 │   ├── layout.tsx       # Root layout with metadata
 │   └── page.tsx         # Main landing page component
-├── tailwind.config.ts   # Tailwind configuration with brand colors
-├── tsconfig.json        # TypeScript configuration
-├── next.config.js       # Next.js configuration
-└── package.json         # Dependencies and scripts
+├── components/
+│   ├── Accordion.tsx    # Reusable accordion component
+│   └── PageLayout.tsx   # Shared layout for all pages
+├── public/              # Static assets
+├── Dockerfile           # Docker configuration
+├── docker-compose.yml   # Docker Compose configuration
+├── nginx.conf           # Nginx reverse proxy config
+├── setup-vm.sh          # VM initialization script
+├── deploy.sh            # Deployment script
+└── DEPLOYMENT.md        # Detailed deployment guide
 ```
 
 ## ✨ Key Features Implementation
+
+### Mobile Hamburger Menu
+- Responsive menu for mobile/tablet screens (< 1024px)
+- Smooth slide-in animation from right
+- Backdrop overlay with click-to-close
+- ESC key support and body scroll lock
+
+### Additional Pages
+- **Privacy Policy**: GDPR-compliant privacy policy for UK business
+- **Terms of Service**: Complete terms and conditions
+- **FAQs**: Interactive accordion with 12 comprehensive questions
+- **About**: Company story, mission, values, and process
 
 ### Smooth Scrolling
 Navigation buttons smoothly scroll to sections using `element.scrollIntoView({ behavior: "smooth" })`.
@@ -80,7 +146,7 @@ Uses `IntersectionObserver` API to detect which section is currently in view and
 ### Responsive Design
 - Mobile-first approach
 - Responsive grid layouts
-- Collapsible mobile navigation
+- Touch-friendly navigation
 - Optimized typography and spacing for all screen sizes
 
 ## 🎯 Target Audience
@@ -88,6 +154,40 @@ Uses `IntersectionObserver` API to detect which section is currently in view and
 - London trades (plumbers, electricians, cleaners, builders)
 - Small to medium local businesses
 - Companies seeking more local enquiries
+
+## 🔒 Security & Performance
+
+- HTTPS support via Let's Encrypt (in production)
+- Docker containerization for consistent environments
+- Nginx reverse proxy for static file serving
+- Next.js optimization and code splitting
+- Standalone output for minimal image size
+
+## 📊 Monitoring
+
+```bash
+# View application logs
+docker-compose logs -f
+
+# Check container stats
+docker stats
+
+# Monitor Nginx logs
+sudo tail -f /var/log/nginx/access.log
+```
+
+## 🔄 Updates & Maintenance
+
+```bash
+# Pull latest changes
+git pull origin main
+
+# Redeploy
+./deploy.sh
+
+# Restart without rebuilding
+docker-compose restart
+```
 
 ## 📝 License
 
