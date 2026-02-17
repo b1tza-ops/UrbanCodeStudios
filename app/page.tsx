@@ -56,7 +56,7 @@ export default function Home() {
 
     // UK phone number validation - accepts formats like: 07XXX XXXXXX, +447XXX XXXXXX, +44 7XXX XXXXXX
     const cleanPhone = phone.replace(/[\s()-]/g, '');
-    if (!phone || !/^(\+?44|0)7\d{9}$/.test(cleanPhone)) {
+    if (!phone || !/^(\+44|0)7\d{9}$/.test(cleanPhone)) {
       errors.phone = "Please enter a valid UK phone number";
     }
 
