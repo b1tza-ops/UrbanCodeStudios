@@ -54,10 +54,10 @@ export default function Home() {
       errors.email = "Please enter a valid email address";
     }
 
-    // UK phone number validation - accepts formats like: 07XXX XXXXXX (11 digits) or +447XXX XXXXXX
+    // UK phone number validation - accepts formats like: 07XXX XXXXXX (11 digits total)
     const cleanPhone = phone.replace(/[\s()-]/g, '');
-    if (!phone || !/^(\+44|0)7\d{8,9}$/.test(cleanPhone)) {
-      errors.phone = "Please enter a valid UK phone number";
+    if (!phone || !/^(\+44|0)7\d{9}$/.test(cleanPhone)) {
+      errors.phone = "Please enter a valid UK mobile number";
     }
 
     if (!business || business.trim().length < 2) {
@@ -746,7 +746,7 @@ export default function Home() {
             >
               {isSubmitting ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
