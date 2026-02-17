@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const observerOptions = {
@@ -41,7 +43,31 @@ export default function Home() {
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
+    setIsMobileMenuOpen(false);
   };
+
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsMobileMenuOpen(false);
+        }
+      };
+      
+      document.addEventListener('keydown', handleEscape);
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = originalOverflow;
+    }
+  }, [isMobileMenuOpen]);
 
   return (
     <div className="min-h-screen">
@@ -58,7 +84,7 @@ export default function Home() {
               <span className="text-xl font-bold text-primary">UrbanCode Studio</span>
             </div>
 
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-8">
               {[
                 { id: "services", label: "Services" },
                 { id: "pricing", label: "Pricing" },
@@ -86,18 +112,86 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
+            {/* Mobile menu button - Hamburger */}
+            <div className="lg:hidden">
               <button
-                onClick={() => scrollToSection("contact")}
-                className="btn-primary text-sm px-4 py-2"
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="p-2 text-primary hover:text-accent transition-colors"
+                aria-label="Open menu"
               >
-                Get a Quote
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
               </button>
             </div>
           </div>
         </nav>
       </header>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+          
+          {/* Mobile Menu Panel */}
+          <div 
+            className={`fixed top-0 right-0 bottom-0 w-[80%] max-w-[300px] bg-white shadow-2xl z-50 lg:hidden transform transition-transform duration-300 ease-in-out ${
+              isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >
+            {/* Close Button */}
+            <div className="flex justify-end p-4">
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 text-gray-600 hover:text-accent transition-colors"
+                aria-label="Close menu"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Mobile Menu Links */}
+            <nav className="flex flex-col px-4">
+              {[
+                { id: "services", label: "Services" },
+                { id: "pricing", label: "Pricing" },
+                { id: "portfolio", label: "Portfolio" },
+                { id: "reviews", label: "Reviews" },
+                { id: "contact", label: "Contact" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`text-left py-4 px-4 text-lg font-medium transition-colors border-b border-gray-200 min-h-[48px] ${
+                    activeSection === item.id
+                      ? "text-accent bg-blue-50"
+                      : "text-primary hover:text-accent hover:bg-gray-50"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+              
+              {/* Mobile CTA Button */}
+              <div className="mt-6 px-4">
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="btn-primary w-full text-base py-4"
+                >
+                  Get a Quote
+                </button>
+              </div>
+            </nav>
+          </div>
+        </>
+      )}
 
       {/* Hero Section */}
       <section id="hero" className="relative bg-gradient-to-b from-lightGrey to-white overflow-hidden">
@@ -630,20 +724,30 @@ export default function Home() {
                     Contact
                   </button>
                 </li>
+                <li>
+                  <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faqs" className="text-gray-300 hover:text-white transition-colors">
+                    FAQs
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
