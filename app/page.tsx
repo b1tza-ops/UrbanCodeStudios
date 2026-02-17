@@ -54,9 +54,9 @@ export default function Home() {
       errors.email = "Please enter a valid email address";
     }
 
-    // UK phone number validation - accepts formats like: 07XXX XXXXXX, +447XXX XXXXXX, +44 7XXX XXXXXX
+    // UK phone number validation - accepts formats like: 07XXX XXXXXX (11 digits) or +447XXX XXXXXX
     const cleanPhone = phone.replace(/[\s()-]/g, '');
-    if (!phone || !/^(\+44|0)7\d{9}$/.test(cleanPhone)) {
+    if (!phone || !/^(\+44|0)7\d{8,9}$/.test(cleanPhone)) {
       errors.phone = "Please enter a valid UK phone number";
     }
 
