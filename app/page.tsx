@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -722,20 +723,30 @@ export default function Home() {
                     Contact
                   </button>
                 </li>
+                <li>
+                  <Link href="/about" className="text-gray-300 hover:text-white transition-colors">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faqs" className="text-gray-300 hover:text-white transition-colors">
+                    FAQs
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/privacy" className="text-gray-300 hover:text-white transition-colors">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
                     Terms of Service
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
