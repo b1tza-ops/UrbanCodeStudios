@@ -1,10 +1,20 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, FormEvent, ChangeEvent } from "react";
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  phone?: string;
+  business?: string;
+}
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const observerOptions = {
@@ -29,9 +39,51 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const validateForm = (formData: FormData): FormErrors => {
+    const errors: FormErrors = {};
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
+    const business = formData.get("business") as string;
+
+    if (!name || name.trim().length < 2) {
+      errors.name = "Please enter your full name";
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = "Please enter a valid email address";
+    }
+
+    if (!phone || !/^[\d\s+()-]{10,}$/.test(phone)) {
+      errors.phone = "Please enter a valid phone number";
+    }
+
+    if (!business || business.trim().length < 2) {
+      errors.business = "Please enter your business type";
+    }
+
+    return errors;
+  };
+
+  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setFormErrors({});
+
+    const formData = new FormData(e.currentTarget);
+    const errors = validateForm(formData);
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
     setShowSuccessMessage(true);
+    setIsSubmitting(false);
     setTimeout(() => setShowSuccessMessage(false), 5000);
     (e.target as HTMLFormElement).reset();
   };
@@ -40,17 +92,26 @@ export default function Home() {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
+      setMobileMenuOpen(false);
     }
   };
 
   return (
     <div className="min-h-screen">
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#hero"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-accent focus:text-white focus:rounded-lg"
+      >
+        Skip to main content
+      </a>
+
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 bg-white shadow-md">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center" aria-hidden="true">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -74,6 +135,7 @@ export default function Home() {
                       ? "text-accent border-b-2 border-accent"
                       : "text-gray-600 hover:text-accent"
                   }`}
+                  aria-current={activeSection === item.id ? "page" : undefined}
                 >
                   {item.label}
                 </button>
@@ -87,15 +149,57 @@ export default function Home() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center space-x-2">
               <button
                 onClick={() => scrollToSection("contact")}
                 className="btn-primary text-sm px-4 py-2"
               >
                 Get a Quote
               </button>
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2 text-gray-600 hover:text-accent transition-colors"
+                aria-label="Toggle mobile menu"
+                aria-expanded={mobileMenuOpen}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {mobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
             </div>
           </div>
+
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 border-t border-gray-200">
+              <div className="flex flex-col space-y-3">
+                {[
+                  { id: "services", label: "Services" },
+                  { id: "pricing", label: "Pricing" },
+                  { id: "portfolio", label: "Portfolio" },
+                  { id: "reviews", label: "Reviews" },
+                  { id: "contact", label: "Contact" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)}
+                    className={`text-left px-4 py-2 text-sm font-medium transition-colors ${
+                      activeSection === item.id
+                        ? "text-accent bg-blue-50"
+                        : "text-gray-600 hover:text-accent hover:bg-gray-50"
+                    }`}
+                    aria-current={activeSection === item.id ? "page" : undefined}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
       </header>
 
@@ -110,16 +214,18 @@ export default function Home() {
               <p className="text-xl text-gray-600">
                 Built for London trades and growing businesses.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4" role="group" aria-label="Call to action buttons">
                 <button
                   onClick={() => scrollToSection("contact")}
                   className="btn-primary"
+                  aria-label="Get your free website audit"
                 >
                   Get Your Free Audit
                 </button>
                 <button
                   onClick={() => scrollToSection("pricing")}
                   className="btn-secondary"
+                  aria-label="View pricing packages"
                 >
                   View Packages
                 </button>
@@ -127,19 +233,19 @@ export default function Home() {
             </div>
 
             {/* Device Mockup */}
-            <div className="relative">
+            <div className="relative" role="img" aria-label="Website mockup preview">
               <div className="card p-8 bg-gradient-to-br from-primary to-accent">
                 <div className="bg-white rounded-lg p-6 space-y-4">
-                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-3 bg-gray-200 rounded w-3/4" aria-hidden="true"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2" aria-hidden="true"></div>
                   <div className="h-40 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg flex items-center justify-center">
-                    <svg className="w-16 h-16 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-16 h-16 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
                   <div className="flex gap-2">
-                    <div className="h-8 bg-accent rounded flex-1"></div>
-                    <div className="h-8 bg-gray-200 rounded flex-1"></div>
+                    <div className="h-8 bg-accent rounded flex-1" aria-hidden="true"></div>
+                    <div className="h-8 bg-gray-200 rounded flex-1" aria-hidden="true"></div>
                   </div>
                 </div>
               </div>
@@ -510,7 +616,7 @@ export default function Home() {
             </div>
           )}
 
-          <form onSubmit={handleFormSubmit} className="max-w-2xl mx-auto space-y-6">
+          <form onSubmit={handleFormSubmit} className="max-w-2xl mx-auto space-y-6" noValidate>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -521,9 +627,18 @@ export default function Home() {
                   id="name"
                   name="name"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all ${
+                    formErrors.name ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="John Smith"
+                  aria-invalid={formErrors.name ? "true" : "false"}
+                  aria-describedby={formErrors.name ? "name-error" : undefined}
                 />
+                {formErrors.name && (
+                  <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {formErrors.name}
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor="business" className="block text-sm font-medium text-gray-700 mb-2">
@@ -534,9 +649,18 @@ export default function Home() {
                   id="business"
                   name="business"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all ${
+                    formErrors.business ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="e.g. Plumber, Electrician"
+                  aria-invalid={formErrors.business ? "true" : "false"}
+                  aria-describedby={formErrors.business ? "business-error" : undefined}
                 />
+                {formErrors.business && (
+                  <p id="business-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {formErrors.business}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -550,9 +674,18 @@ export default function Home() {
                   id="email"
                   name="email"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all ${
+                    formErrors.email ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="john@example.com"
+                  aria-invalid={formErrors.email ? "true" : "false"}
+                  aria-describedby={formErrors.email ? "email-error" : undefined}
                 />
+                {formErrors.email && (
+                  <p id="email-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {formErrors.email}
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
@@ -563,9 +696,18 @@ export default function Home() {
                   id="phone"
                   name="phone"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all"
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-accent focus:border-accent outline-none transition-all ${
+                    formErrors.phone ? "border-red-500" : "border-gray-300"
+                  }`}
                   placeholder="07XXX XXXXXX"
+                  aria-invalid={formErrors.phone ? "true" : "false"}
+                  aria-describedby={formErrors.phone ? "phone-error" : undefined}
                 />
+                {formErrors.phone && (
+                  <p id="phone-error" className="mt-1 text-sm text-red-600" role="alert">
+                    {formErrors.phone}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -595,8 +737,22 @@ export default function Home() {
               </label>
             </div>
 
-            <button type="submit" className="btn-primary w-full text-lg py-4">
-              Send Message
+            <button 
+              type="submit" 
+              className="btn-primary w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Sending...
+                </>
+              ) : (
+                "Send Message"
+              )}
             </button>
           </form>
         </div>
