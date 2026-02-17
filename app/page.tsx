@@ -47,25 +47,26 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    
-    if (isMobileMenuOpen) {
+      
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          setIsMobileMenuOpen(false);
+        }
+      };
+      
       document.addEventListener('keydown', handleEscape);
+      
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.removeEventListener('keydown', handleEscape);
+      };
+    } else {
+      document.body.style.overflow = originalOverflow;
     }
-    
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-    };
   }, [isMobileMenuOpen]);
 
   return (
