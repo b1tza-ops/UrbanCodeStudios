@@ -47,19 +47,19 @@ export default function Home() {
     const business = formData.get("business") as string;
 
     if (!name || name.trim().length < 2) {
-      errors.name = "Please enter your full name";
+      errors.name = "Name must be at least 2 characters";
     }
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.email = "Please enter a valid email address";
     }
 
-    if (!phone || !/^[\d\s+()-]{10,}$/.test(phone)) {
-      errors.phone = "Please enter a valid phone number";
+    if (!phone || !/^(\+44\s?|0)(\d\s?){9,10}$/.test(phone.replace(/[\s()-]/g, ''))) {
+      errors.phone = "Please enter a valid UK phone number";
     }
 
     if (!business || business.trim().length < 2) {
-      errors.business = "Please enter your business type";
+      errors.business = "Business type must be at least 2 characters";
     }
 
     return errors;
