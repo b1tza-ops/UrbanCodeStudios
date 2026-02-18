@@ -75,16 +75,20 @@ docker build -t urbancodestudio .
 docker run -p 3000:3000 urbancodestudio
 ```
 
-## ☁️ Google Cloud VM Deployment
+## ☁️ VPS Deployment
 
-For detailed instructions on deploying to Google Cloud VM, see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
+For detailed instructions on deploying to any VPS (DigitalOcean, Linode, Vultr, Google Cloud, etc.), see **[DEPLOYMENT.md](./DEPLOYMENT.md)**.
 
 ### Quick Deployment Steps:
 
-1. **Create a Google Cloud VM** (Ubuntu 22.04, e2-small recommended)
-2. **SSH into your VM**
-3. **Run setup script**:
+1. **Get a VPS** (Ubuntu 22.04, 2GB RAM recommended)
+2. **SSH into your VPS**
+3. **Clone and setup**:
    ```bash
+   cd /opt
+   sudo git clone https://github.com/b1tza-ops/UrbanCodeStudios.git urbancodestudio
+   cd urbancodestudio
+   sudo chmod +x setup-vm.sh deploy.sh
    sudo ./setup-vm.sh
    ```
 4. **Configure and deploy**:
@@ -93,6 +97,7 @@ For detailed instructions on deploying to Google Cloud VM, see **[DEPLOYMENT.md]
    ./deploy.sh
    ```
 5. **Configure Nginx** (see DEPLOYMENT.md for details)
+6. **Setup Cloudflare** (optional but recommended - see CLOUDFLARE.md)
 
 ## 📱 Project Structure
 
