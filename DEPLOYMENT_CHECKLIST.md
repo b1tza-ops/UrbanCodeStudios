@@ -1,20 +1,30 @@
-# Google Cloud VM Deployment Checklist
+# VPS Deployment Checklist
 
-Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google Cloud VM.
+Use this checklist to ensure a smooth deployment of UrbanCode Studio to your VPS (works with any provider).
 
 ## Pre-Deployment Checklist
 
-### Google Cloud Setup
-- [ ] Google Cloud Platform account created
-- [ ] Billing account configured
-- [ ] Project created in Google Cloud Console
-- [ ] Compute Engine API enabled
-- [ ] `gcloud` CLI installed (optional, for CLI deployment)
+### VPS Setup
+- [ ] VPS account created (DigitalOcean, Linode, Vultr, Google Cloud, etc.)
+- [ ] VPS instance created with Ubuntu 22.04 LTS
+- [ ] Minimum: 1 GB RAM, 1 vCPU, 10 GB disk (2 GB RAM recommended)
+- [ ] SSH access configured
+- [ ] Firewall allows ports 22 (SSH), 80 (HTTP), 443 (HTTPS)
 
-### Domain Setup (Optional)
+### Domain & DNS Setup
 - [ ] Domain name purchased
 - [ ] Access to domain DNS settings
-- [ ] DNS configured to point to VM IP
+- [ ] Decision made: Cloudflare or direct DNS
+
+#### If Using Cloudflare (Recommended)
+- [ ] Cloudflare account created
+- [ ] Domain added to Cloudflare
+- [ ] Nameservers updated at domain registrar
+- [ ] DNS records ready to configure
+
+#### If Using Direct DNS
+- [ ] Access to domain registrar's DNS settings
+- [ ] Ready to create A records
 
 ### Local Preparation
 - [ ] Code repository cloned and updated
@@ -25,7 +35,27 @@ Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google C
 
 ## Deployment Process
 
-### Phase 1: Create VM Instance (15 minutes)
+### Phase 1: VPS Setup (15 minutes)
+
+#### Option A: Generic VPS (DigitalOcean, Linode, Vultr, etc.)
+
+- [ ] **Create VPS Instance**
+  - OS: Ubuntu 22.04 LTS
+  - Size: 2 GB RAM / 1 vCPU (or better)
+  - Region: Closest to target audience
+  - SSH key configured
+
+- [ ] **Note VPS IP Address**
+  IP Address: ___________________________
+
+- [ ] **SSH into VPS**
+  ```bash
+  ssh root@YOUR_VPS_IP
+  # or
+  ssh username@YOUR_VPS_IP
+  ```
+
+#### Option B: Google Cloud VM
 
 - [ ] **Create VM Instance**
   - Name: `urbancode-studio`
@@ -102,6 +132,13 @@ Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google C
 ### Phase 4: Nginx Configuration (10 minutes)
 
 - [ ] **Copy nginx configuration**
+  
+  **If using Cloudflare:**
+  ```bash
+  sudo cp nginx-cloudflare.conf /etc/nginx/sites-available/urbancodestudio
+  ```
+  
+  **If NOT using Cloudflare:**
   ```bash
   sudo cp nginx.conf /etc/nginx/sites-available/urbancodestudio
   ```
@@ -111,7 +148,7 @@ Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google C
   sudo nano /etc/nginx/sites-available/urbancodestudio
   ```
   - Replace `your-domain.com` with actual domain
-  - OR use VM IP for testing
+  - OR use VPS IP for testing
 
 - [ ] **Enable site**
   ```bash
@@ -130,19 +167,61 @@ Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google C
   ```
 
 - [ ] **Test HTTP access**
-  - Open browser to `http://YOUR_DOMAIN` or `http://YOUR_VM_IP`
+  - Open browser to `http://YOUR_DOMAIN` or `http://YOUR_VPS_IP`
   - Verify site loads through Nginx
 
-### Phase 5: Domain Configuration (If applicable) (15 minutes)
+### Phase 5: DNS Configuration (15 minutes)
 
-- [ ] **Configure DNS records**
-  At your domain registrar:
-  - A Record: `@` → `YOUR_VM_IP`
-  - A Record: `www` → `YOUR_VM_IP`
+#### Option A: Using Cloudflare (Recommended)
+
+- [ ] **Add site to Cloudflare**
+  - Log in to Cloudflare dashboard
+  - Click "Add a Site"
+  - Enter your domain name
+  - Select Free plan
+
+- [ ] **Update nameservers**
+  - Copy Cloudflare nameservers
+  - Update at domain registrar
+  - Wait for confirmation (can take 24-48 hours)
+
+- [ ] **Configure DNS records in Cloudflare**
+  - A Record: `@` → `YOUR_VPS_IP` (Proxied/Orange cloud)
+  - A Record: `www` → `YOUR_VPS_IP` (Proxied/Orange cloud)
+
+- [ ] **Configure SSL/TLS in Cloudflare**
+  - Go to SSL/TLS → Overview
+  - Select **Full** or **Full (Strict)** mode
+  - Enable "Always Use HTTPS"
+  - Enable "Automatic HTTPS Rewrites"
 
 - [ ] **Wait for DNS propagation** (5-30 minutes)
   ```bash
   nslookup your-domain.com
+  # Should show Cloudflare IPs (not your VPS IP)
+  ```
+
+- [ ] **Test domain access**
+  - Open browser to `https://your-domain.com`
+  - Verify site loads with HTTPS
+  - Check for Cloudflare headers: `curl -I https://your-domain.com | grep cloudflare`
+
+- [ ] **Review [CLOUDFLARE.md](./CLOUDFLARE.md) for optimization**
+  - Security settings
+  - Performance optimization
+  - Caching rules
+
+#### Option B: Direct DNS (Without Cloudflare)
+
+- [ ] **Configure DNS records**
+  At your domain registrar:
+  - A Record: `@` → `YOUR_VPS_IP`
+  - A Record: `www` → `YOUR_VPS_IP`
+
+- [ ] **Wait for DNS propagation** (5-30 minutes)
+  ```bash
+  nslookup your-domain.com
+  # Should show YOUR_VPS_IP
   ```
 
 - [ ] **Test domain access**
@@ -151,19 +230,20 @@ Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google C
 
 ### Phase 6: SSL Setup (10 minutes)
 
-- [ ] **Install Certbot**
-  ```bash
-  sudo apt install certbot python3-certbot-nginx -y
-  ```
+#### If Using Cloudflare
 
-- [ ] **Obtain SSL certificate**
+- [ ] **SSL is automatically provided by Cloudflare!**
+  - HTTPS should already work
+  - No additional setup needed for Flexible or Full mode
+  
+- [ ] **For Full (Strict) mode - Install Let's Encrypt** (recommended for production)
   ```bash
+  # Install Certbot
+  sudo apt install certbot python3-certbot-nginx -y
+  
+  # Obtain SSL certificate
   sudo certbot --nginx -d your-domain.com -d www.your-domain.com
   ```
-  Follow prompts:
-  - Enter email address
-  - Agree to terms
-  - Choose redirect option (recommended)
 
 - [ ] **Test SSL certificate**
   ```bash
@@ -171,6 +251,16 @@ Use this checklist to ensure a smooth deployment of UrbanCode Studio to Google C
   ```
 
 - [ ] **Test HTTPS access**
+  - Open browser to `https://your-domain.com`
+  - Verify SSL certificate is valid (Cloudflare or Let's Encrypt)
+  - Check automatic HTTP → HTTPS redirect
+
+- [ ] **Test auto-renewal** (if using Let's Encrypt)
+  ```bash
+  sudo certbot renew --dry-run
+  ```
+
+#### If NOT Using Cloudflare
   - Open browser to `https://your-domain.com`
   - Verify SSL certificate is valid
   - Check automatic HTTP → HTTPS redirect

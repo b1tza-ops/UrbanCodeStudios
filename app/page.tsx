@@ -2,10 +2,15 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import TestimonialCarousel from "@/components/TestimonialCarousel";
+import TrustBadges from "@/components/TrustBadges";
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -31,11 +36,43 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 5000);
-    (e.target as HTMLFormElement).reset();
+    setIsSubmitting(true);
+    setShowErrorMessage("");
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.get("name"),
+          business: formData.get("business"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          message: formData.get("message"),
+          consent: formData.get("consent") === "on",
+          website: formData.get("website"), // honeypot
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 5000);
+        form.reset();
+      } else {
+        setShowErrorMessage(data.error || "Something went wrong.");
+      }
+    } catch {
+      setShowErrorMessage("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const scrollToSection = (id: string) => {
@@ -198,11 +235,17 @@ export default function Home() {
         <div className="section-container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
+              <div className="inline-flex items-center px-4 py-2 bg-accent/10 rounded-full text-accent text-sm font-semibold">
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+                Rated 4.9/5 by London businesses
+              </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl heading leading-tight">
                 Websites That Bring You More Local Clients.
               </h1>
               <p className="text-xl text-gray-600">
-                Built for London trades and growing businesses.
+                Built for London trades and growing businesses. Fast, mobile-first websites that convert visitors into paying customers.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
@@ -218,22 +261,64 @@ export default function Home() {
                   View Packages
                 </button>
               </div>
+              {/* Trust indicators */}
+              <div className="flex items-center gap-6 pt-4">
+                <div className="flex -space-x-3">
+                  {[
+                    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face",
+                    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face",
+                    "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face",
+                    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face",
+                  ].map((src, i) => (
+                    <div key={i} className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-white">
+                      <Image src={src} alt="Client" fill className="object-cover" sizes="40px" />
+                    </div>
+                  ))}
+                </div>
+                <div className="text-sm text-gray-600">
+                  <span className="font-semibold text-primary">50+ businesses</span> trust us with their web presence
+                </div>
+              </div>
             </div>
 
-            {/* Device Mockup */}
+            {/* Hero Image */}
             <div className="relative">
-              <div className="card p-8 bg-gradient-to-br from-primary to-accent">
-                <div className="bg-white rounded-lg p-6 space-y-4">
-                  <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-40 bg-gradient-to-br from-accent/20 to-primary/20 rounded-lg flex items-center justify-center">
-                    <svg className="w-16 h-16 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"
+                  alt="Professional website design on laptop and mobile devices"
+                  width={800}
+                  height={600}
+                  className="w-full h-auto"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
+              </div>
+              {/* Floating stats card */}
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-xl p-4 hidden md:block">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                   </div>
-                  <div className="flex gap-2">
-                    <div className="h-8 bg-accent rounded flex-1"></div>
-                    <div className="h-8 bg-gray-200 rounded flex-1"></div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">3x</div>
+                    <div className="text-xs text-gray-500">More enquiries</div>
+                  </div>
+                </div>
+              </div>
+              {/* Floating speed card */}
+              <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-xl p-4 hidden md:block">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">&lt;2s</div>
+                    <div className="text-xs text-gray-500">Load time</div>
                   </div>
                 </div>
               </div>
@@ -241,6 +326,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Trust Badges */}
+      <TrustBadges />
 
       {/* Problem Section */}
       <section id="problem" className="bg-white">
@@ -301,14 +389,18 @@ export default function Home() {
       {/* Services Section */}
       <section id="services" className="bg-lightGrey">
         <div className="section-container">
-          <h2 className="text-3xl sm:text-4xl heading text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl heading text-center mb-4">
             What We Do
           </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Everything your business needs to stand out online and attract more local customers.
+          </p>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 title: "Website Design",
                 description: "Fast, mobile-first websites that convert visitors into customers",
+                image: "https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&h=400&fit=crop",
                 features: [
                   "Mobile-optimised design",
                   "Fast loading speeds",
@@ -319,6 +411,7 @@ export default function Home() {
               {
                 title: "Local SEO Setup",
                 description: "Get found by customers searching in your area",
+                image: "https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=600&h=400&fit=crop",
                 features: [
                   "On-page SEO structure",
                   "Local keyword targeting",
@@ -329,6 +422,7 @@ export default function Home() {
               {
                 title: "Google Business Optimisation",
                 description: "Show up on Google Maps when customers search nearby",
+                image: "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&h=400&fit=crop",
                 features: [
                   "Google Business Profile setup",
                   "Maps optimization",
@@ -337,7 +431,17 @@ export default function Home() {
                 ],
               },
             ].map((service, index) => (
-              <div key={index} className="card">
+              <div key={index} className="card overflow-hidden group">
+                <div className="relative h-48 -mx-6 -mt-6 mb-6 overflow-hidden">
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent" />
+                </div>
                 <h3 className="text-2xl font-bold text-primary mb-3">{service.title}</h3>
                 <p className="text-gray-600 mb-4">{service.description}</p>
                 <h4 className="font-semibold text-primary mb-2">What you get:</h4>
@@ -440,17 +544,69 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Before & After Section */}
+      {/* Before & After / Portfolio Section */}
       <section id="portfolio" className="bg-lightGrey">
         <div className="section-container">
-          <h2 className="text-3xl sm:text-4xl heading text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl heading text-center mb-4">
             From Outdated to High-Converting
           </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            See the real transformations we&apos;ve delivered for London businesses.
+          </p>
+
+          {/* Portfolio gallery */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+            {[
+              {
+                title: "JT Electrical",
+                category: "Electrician",
+                image: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&h=450&fit=crop",
+                result: "+180% more calls",
+              },
+              {
+                title: "Sparkle Clean",
+                category: "Cleaning Services",
+                image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600&h=450&fit=crop",
+                result: "+50% bookings",
+              },
+              {
+                title: "Roberts Builders",
+                category: "Construction",
+                image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=450&fit=crop",
+                result: "2 major contracts",
+              },
+            ].map((project, index) => (
+              <div key={index} className="card overflow-hidden group cursor-pointer">
+                <div className="relative h-56 -mx-6 -mt-6 mb-6 overflow-hidden">
+                  <Image
+                    src={project.image}
+                    alt={`${project.title} website redesign`}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                    <span className="text-white font-semibold text-lg">{project.result}</span>
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold text-primary">{project.title}</h3>
+                <p className="text-sm text-gray-500">{project.category}</p>
+                <div className="mt-3 inline-flex items-center text-accent text-sm font-semibold">
+                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                  {project.result}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Before & After comparison */}
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Old Site */}
             <div className="card bg-gray-100">
               <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-4">
-                <div className="text-xs text-gray-400 mb-2">Old Site ❌</div>
+                <div className="text-xs text-gray-400 mb-2">Old Site &#x274C;</div>
                 <div className="space-y-2">
                   <div className="h-2 bg-red-300 rounded w-full"></div>
                   <div className="h-2 bg-red-300 rounded w-2/3"></div>
@@ -465,17 +621,17 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold text-gray-700 mb-3">Typical Problems:</h3>
               <ul className="space-y-2 text-gray-600">
-                <li>✗ Cluttered layout</li>
-                <li>✗ Tiny text on mobile</li>
-                <li>✗ No clear next steps</li>
-                <li>✗ Slow loading times</li>
+                <li>&#x2717; Cluttered layout</li>
+                <li>&#x2717; Tiny text on mobile</li>
+                <li>&#x2717; No clear next steps</li>
+                <li>&#x2717; Slow loading times</li>
               </ul>
             </div>
 
             {/* New Site */}
             <div className="card bg-white">
               <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-4">
-                <div className="text-xs text-gray-400 mb-2">New Site ✓</div>
+                <div className="text-xs text-gray-400 mb-2">New Site &#x2713;</div>
                 <div className="space-y-3">
                   <div className="h-3 bg-accent rounded w-1/2"></div>
                   <div className="h-20 bg-gradient-to-br from-accent/20 to-primary/20 rounded"></div>
@@ -489,30 +645,14 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-bold text-primary mb-3">Our Solution:</h3>
               <ul className="space-y-2 text-gray-700">
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Clean, modern design
-                </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Mobile-first approach
-                </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Clear CTAs
-                </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Lightning fast
-                </li>
+                {["Clean, modern design", "Mobile-first approach", "Clear CTAs", "Lightning fast"].map((item, i) => (
+                  <li key={i} className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {item}
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -522,51 +662,13 @@ export default function Home() {
       {/* Testimonials Section */}
       <section id="reviews" className="bg-white">
         <div className="section-container">
-          <h2 className="text-3xl sm:text-4xl heading text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl heading text-center mb-4">
             What Our Clients Say
           </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {[
-              {
-                name: "James T.",
-                business: "Electrician, East London",
-                quote: "More calls in the first week.",
-                avatar: "JT",
-              },
-              {
-                name: "Sarah M.",
-                business: "Cleaning Services",
-                quote: "Clean, fast, and professional.",
-                avatar: "SM",
-              },
-              {
-                name: "David R.",
-                business: "Building Contractor",
-                quote: "Best value website we've had.",
-                avatar: "DR",
-              },
-            ].map((testimonial, index) => (
-              <div key={index} className="card">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-accent text-white rounded-full flex items-center justify-center font-semibold text-lg mr-3">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-primary">{testimonial.name}</div>
-                    <div className="text-sm text-gray-500">{testimonial.business}</div>
-                  </div>
-                </div>
-                <div className="flex mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-gray-700 italic">"{testimonial.quote}"</p>
-              </div>
-            ))}
-          </div>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            Don&apos;t just take our word for it. Here&apos;s what London business owners have to say about working with us.
+          </p>
+          <TestimonialCarousel />
         </div>
       </section>
 
@@ -599,12 +701,24 @@ export default function Home() {
           
           {showSuccessMessage && (
             <div className="max-w-2xl mx-auto mb-6 bg-green-50 border-2 border-green-500 text-green-800 px-6 py-4 rounded-xl">
-              <p className="font-semibold">✓ Message sent successfully!</p>
-              <p className="text-sm">We'll get back to you soon.</p>
+              <p className="font-semibold">&#x2713; Message sent successfully!</p>
+              <p className="text-sm">We&apos;ll get back to you within 24 hours.</p>
+            </div>
+          )}
+
+          {showErrorMessage && (
+            <div className="max-w-2xl mx-auto mb-6 bg-red-50 border-2 border-red-500 text-red-800 px-6 py-4 rounded-xl">
+              <p className="font-semibold">&#x2717; {showErrorMessage}</p>
             </div>
           )}
 
           <form onSubmit={handleFormSubmit} className="max-w-2xl mx-auto space-y-6">
+            {/* Honeypot field — hidden from real users, bots fill it in */}
+            <div className="absolute opacity-0 pointer-events-none" aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>
+              <label htmlFor="website">Website</label>
+              <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+            </div>
+
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -689,8 +803,18 @@ export default function Home() {
               </label>
             </div>
 
-            <button type="submit" className="btn-primary w-full text-lg py-4">
-              Send Message
+            <button type="submit" disabled={isSubmitting} className="btn-primary w-full text-lg py-4 disabled:opacity-50 disabled:cursor-not-allowed">
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Sending...
+                </span>
+              ) : (
+                "Send Message"
+              )}
             </button>
           </form>
         </div>

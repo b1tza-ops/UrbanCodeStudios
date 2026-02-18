@@ -1,12 +1,127 @@
-# Google Cloud VM Deployment Guide
+# VPS Deployment Guide
 
-This guide will help you deploy the UrbanCode Studio website to a Google Cloud VM instance.
+This guide will help you deploy the UrbanCode Studio website to a VPS (Virtual Private Server). It covers both generic VPS deployment and specific instructions for Google Cloud VM.
 
 ## Prerequisites
 
-- Google Cloud Platform account
-- A domain name (optional, for production)
+- A VPS with Ubuntu 22.04 LTS (or similar Linux distribution)
+  - Minimum: 1 GB RAM, 1 vCPU, 10 GB disk
+  - Recommended: 2 GB RAM, 2 vCPUs, 20 GB disk
+- SSH access to your VPS
+- A domain name (recommended for production)
 - Basic knowledge of Linux command line
+
+## Supported VPS Providers
+
+This guide works with any VPS provider, including:
+- **Google Cloud Platform** (detailed instructions below)
+- **DigitalOcean**
+- **Linode**
+- **Vultr**
+- **AWS EC2**
+- **Hetzner**
+- **Any other VPS provider with Ubuntu**
+
+## Cloudflare Integration
+
+If you're using Cloudflare for DNS and CDN (highly recommended), see the **[CLOUDFLARE.md](./CLOUDFLARE.md)** guide for:
+- Setting up Cloudflare with your domain
+- Configuring SSL/TLS with Cloudflare
+- Performance optimization
+- Security configuration
+- Nginx configuration for Cloudflare
+
+---
+
+## Quick Start (Generic VPS)
+
+If you already have a VPS with Ubuntu 22.04, follow these steps:
+
+### 1. Get Your VPS Ready
+
+Ensure you have:
+- Ubuntu 22.04 LTS (or compatible Linux distribution)
+- SSH access (username and IP address)
+- Firewall configured to allow ports 22 (SSH), 80 (HTTP), 443 (HTTPS)
+
+### 2. Connect to Your VPS
+
+```bash
+# SSH into your VPS
+ssh username@YOUR_VPS_IP
+
+# Or if using SSH key
+ssh -i /path/to/key username@YOUR_VPS_IP
+```
+
+### 3. Run Setup Script
+
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Clone repository
+cd /opt
+sudo git clone https://github.com/b1tza-ops/UrbanCodeStudios.git urbancodestudio
+cd urbancodestudio
+
+# Make scripts executable
+sudo chmod +x setup-vm.sh deploy.sh
+
+# Run setup (installs Docker, Nginx, etc.)
+sudo ./setup-vm.sh
+```
+
+### 4. Deploy Application
+
+```bash
+# Configure environment
+cp .env.example .env
+nano .env  # Edit if needed
+
+# Deploy
+./deploy.sh
+```
+
+### 5. Configure Nginx
+
+```bash
+# Copy and edit nginx configuration
+sudo cp nginx.conf /etc/nginx/sites-available/urbancodestudio
+sudo nano /etc/nginx/sites-available/urbancodestudio
+# Replace 'your-domain.com' with your actual domain or VPS IP
+
+# Enable site
+sudo ln -s /etc/nginx/sites-available/urbancodestudio /etc/nginx/sites-enabled/
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test and reload
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 6. Setup SSL (Optional but Recommended)
+
+**Option A: With Cloudflare** (Recommended)
+- See [CLOUDFLARE.md](./CLOUDFLARE.md) for complete setup
+- Cloudflare provides free SSL certificates
+- No server-side SSL setup needed if using Cloudflare Flexible SSL
+- For Full (Strict) SSL, use Let's Encrypt below
+
+**Option B: With Let's Encrypt**
+```bash
+# Install Certbot
+sudo apt install certbot python3-certbot-nginx -y
+
+# Obtain SSL certificate
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+```
+
+Your site should now be live! 🚀
+
+---
+
+## Google Cloud Platform - Detailed Instructions
 
 ## 1. Create a Google Cloud VM Instance
 
@@ -188,6 +303,24 @@ gcloud compute firewall-rules create allow-https \
 ```
 
 ## 9. Point Your Domain to the VM
+
+You have two options for DNS management:
+
+### Option A: Using Cloudflare (Recommended)
+
+Cloudflare provides free SSL, CDN, and DDoS protection.
+
+1. **Sign up for Cloudflare** at [cloudflare.com](https://cloudflare.com)
+2. **Add your domain** to Cloudflare
+3. **Update nameservers** at your domain registrar to Cloudflare's nameservers
+4. **Add DNS records** in Cloudflare:
+   - **A Record**: `@` → `YOUR_VM_IP` (Proxied/Orange cloud)
+   - **A Record**: `www` → `YOUR_VM_IP` (Proxied/Orange cloud)
+5. **Configure SSL/TLS** in Cloudflare (see [CLOUDFLARE.md](./CLOUDFLARE.md))
+
+**For complete Cloudflare setup, see [CLOUDFLARE.md](./CLOUDFLARE.md)**
+
+### Option B: Direct DNS (Without Cloudflare)
 
 1. Get your VM's external IP:
    ```bash
