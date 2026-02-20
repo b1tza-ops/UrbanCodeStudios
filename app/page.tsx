@@ -129,24 +129,20 @@ export default function Home() {
                 { id: "reviews", label: "Reviews", href: "/reviews" },
                 { id: "contact", label: "Contact", href: "/contact" },
               ].map((item) => (
-                <button
+                <Link
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`text-sm font-medium transition-colors ${
-                    activeSection === item.id
-                      ? "text-accent border-b-2 border-accent"
-                      : "text-gray-600 hover:text-accent"
-                  }`}
+                  href={item.href}
+                  className="text-sm font-medium transition-colors text-gray-600 hover:text-accent"
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
-              <button
-                onClick={() => scrollToSection("contact")}
+              <Link
+                href="/contact"
                 className="btn-primary text-sm"
               >
                 Get a Quote
-              </button>
+              </Link>
             </div>
 
             {/* Mobile menu button - Hamburger */}
@@ -203,27 +199,24 @@ export default function Home() {
                 { id: "reviews", label: "Reviews", href: "/reviews" },
                 { id: "contact", label: "Contact", href: "/contact" },
               ].map((item) => (
-                <button
+                <Link
                   key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className={`text-left py-4 px-4 text-lg font-medium transition-colors border-b border-gray-200 min-h-[48px] ${
-                    activeSection === item.id
-                      ? "text-accent bg-blue-50"
-                      : "text-primary hover:text-accent hover:bg-gray-50"
-                  }`}
+                  href={item.href}
+                  className="text-left py-4 px-4 text-lg font-medium transition-colors border-b border-gray-200 min-h-[48px] text-primary hover:text-accent hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.label}
-                </button>
+                </Link>
               ))}
               
               {/* Mobile CTA Button */}
               <div className="mt-6 px-4">
-                <button
-                  onClick={() => scrollToSection("contact")}
-                  className="btn-primary w-full text-base py-4"
+                <Link
+                  href="/contact"
+                  className="btn-primary w-full text-base py-4 text-center block"
                 >
                   Get a Quote
-                </button>
+                </Link>
               </div>
             </nav>
           </div>
