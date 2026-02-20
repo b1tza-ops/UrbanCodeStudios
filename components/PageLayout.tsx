@@ -11,7 +11,6 @@ interface PageLayoutProps {
 export default function PageLayout({ children }: PageLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const isHomePage = pathname === "/";
 
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -36,22 +35,12 @@ export default function PageLayout({ children }: PageLayoutProps) {
     }
   }, [isMobileMenuOpen]);
 
-  const scrollToSection = (id: string) => {
-    if (isHomePage) {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-    setIsMobileMenuOpen(false);
-  };
-
   const navItems = [
-    { id: "services", label: "Services", href: "/#services" },
-    { id: "pricing", label: "Pricing", href: "/#pricing" },
-    { id: "portfolio", label: "Portfolio", href: "/#portfolio" },
-    { id: "reviews", label: "Reviews", href: "/#reviews" },
-    { id: "contact", label: "Contact", href: "/#contact" },
+    { id: "services", label: "Services", href: "/services" },
+    { id: "pricing", label: "Pricing", href: "/pricing" },
+    { id: "portfolio", label: "Portfolio", href: "/portfolio" },
+    { id: "reviews", label: "Reviews", href: "/reviews" },
+    { id: "contact", label: "Contact", href: "/contact" },
   ];
 
   return (
@@ -71,36 +60,21 @@ export default function PageLayout({ children }: PageLayoutProps) {
 
             <div className="hidden lg:flex items-center space-x-8">
               {navItems.map((item) => (
-                isHomePage ? (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className="text-sm font-medium text-gray-600 hover:text-accent transition-colors"
-                  >
-                    {item.label}
-                  </button>
-                ) : (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    className="text-sm font-medium text-gray-600 hover:text-accent transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                )
-              ))}
-              {isHomePage ? (
-                <button
-                  onClick={() => scrollToSection("contact")}
-                  className="btn-primary text-sm"
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors ${
+                    pathname === item.href
+                      ? "text-accent border-b-2 border-accent"
+                      : "text-gray-600 hover:text-accent"
+                  }`}
                 >
-                  Get a Quote
-                </button>
-              ) : (
-                <Link href="/#contact" className="btn-primary text-sm">
-                  Get a Quote
+                  {item.label}
                 </Link>
-              )}
+              ))}
+              <Link href="/contact" className="btn-primary text-sm">
+                Get a Quote
+              </Link>
             </div>
 
             {/* Mobile menu button - Hamburger */}
@@ -151,40 +125,25 @@ export default function PageLayout({ children }: PageLayoutProps) {
             {/* Mobile Menu Links */}
             <nav className="flex flex-col px-4">
               {navItems.map((item) => (
-                isHomePage ? (
-                  <button
-                    key={item.id}
-                    onClick={() => scrollToSection(item.id)}
-                    className="text-left py-4 px-4 text-lg font-medium transition-colors border-b border-gray-200 min-h-[48px] text-primary hover:text-accent hover:bg-gray-50"
-                  >
-                    {item.label}
-                  </button>
-                ) : (
-                  <Link
-                    key={item.id}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="text-left py-4 px-4 text-lg font-medium transition-colors border-b border-gray-200 min-h-[48px] text-primary hover:text-accent hover:bg-gray-50"
-                  >
-                    {item.label}
-                  </Link>
-                )
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`text-left py-4 px-4 text-lg font-medium transition-colors border-b border-gray-200 min-h-[48px] ${
+                    pathname === item.href
+                      ? "text-accent bg-blue-50"
+                      : "text-primary hover:text-accent hover:bg-gray-50"
+                  }`}
+                >
+                  {item.label}
+                </Link>
               ))}
               
               {/* Mobile CTA Button */}
               <div className="mt-6 px-4">
-                {isHomePage ? (
-                  <button
-                    onClick={() => scrollToSection("contact")}
-                    className="btn-primary w-full text-base py-4"
-                  >
-                    Get a Quote
-                  </button>
-                ) : (
-                  <Link href="/#contact" className="btn-primary w-full text-base py-4 block text-center">
-                    Get a Quote
-                  </Link>
-                )}
+                <Link href="/contact" className="btn-primary w-full text-base py-4 block text-center">
+                  Get a Quote
+                </Link>
               </div>
             </nav>
           </div>
@@ -210,17 +169,27 @@ export default function PageLayout({ children }: PageLayoutProps) {
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link href="/#services" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/services" className="text-gray-300 hover:text-white transition-colors">
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#pricing" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">
                     Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#contact" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/portfolio" className="text-gray-300 hover:text-white transition-colors">
+                    Portfolio
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/reviews" className="text-gray-300 hover:text-white transition-colors">
+                    Reviews
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                     Contact
                   </Link>
                 </li>
