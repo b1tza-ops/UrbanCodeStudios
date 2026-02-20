@@ -146,7 +146,7 @@ const pricingSchema = {
       price: "299",
       priceCurrency: "GBP",
       description: "1-page mobile-optimised website for tradespeople",
-      url: "https://urbancodestudio.co.uk/pricing",
+      url: "https://urbancodestudios.com/pricing",
     },
     {
       "@type": "Offer",
@@ -154,7 +154,7 @@ const pricingSchema = {
       price: "499",
       priceCurrency: "GBP",
       description: "Up to 5-page website with SEO and Google Analytics",
-      url: "https://urbancodestudio.co.uk/pricing",
+      url: "https://urbancodestudios.com/pricing",
     },
     {
       "@type": "Offer",
@@ -162,7 +162,7 @@ const pricingSchema = {
       price: "799",
       priceCurrency: "GBP",
       description: "Up to 10-page website with local SEO and Google Business",
-      url: "https://urbancodestudio.co.uk/pricing",
+      url: "https://urbancodestudios.com/pricing",
     },
   ],
 };

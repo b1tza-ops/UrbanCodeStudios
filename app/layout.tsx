@@ -3,7 +3,7 @@ import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://urbancodestudio.co.uk"),
+  metadataBase: new URL("https://urbancodestudios.com"),
   title: {
     default: "UrbanCode Studio | Web Design for London Trades & Local Businesses",
     template: "%s | UrbanCode Studio",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     "small business website london",
     "mobile friendly website design",
   ],
-  authors: [{ name: "UrbanCode Studio", url: "https://urbancodestudio.co.uk" }],
+  authors: [{ name: "UrbanCode Studio", url: "https://urbancodestudios.com" }],
   creator: "UrbanCode Studio",
   publisher: "UrbanCode Studio",
   alternates: {
@@ -59,7 +59,7 @@ const localBusinessSchema = {
   "@type": "ProfessionalService",
   name: "UrbanCode Studio",
   description: "Professional web design agency for London trades and local businesses. Fast, mobile-first websites from £299.",
-  url: "https://urbancodestudio.co.uk",
+  url: "https://urbancodestudios.com",
   email: "hello@urbancodestudio.com",
   areaServed: {
     "@type": "City",

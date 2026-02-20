@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/"],
       },
     ],
-    sitemap: "https://urbancodestudio.co.uk/sitemap.xml",
+    sitemap: "https://urbancodestudios.com/sitemap.xml",
   };
 }

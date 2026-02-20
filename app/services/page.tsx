@@ -122,7 +122,7 @@ const serviceSchema = {
   provider: {
     "@type": "ProfessionalService",
     name: "UrbanCode Studio",
-    url: "https://urbancodestudio.co.uk",
+    url: "https://urbancodestudios.com",
   },
   areaServed: {
     "@type": "City",
