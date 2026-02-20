@@ -2,10 +2,29 @@ import { Metadata } from "next";
 import PageLayout from "@/components/PageLayout";
 import Accordion from "@/components/Accordion";
 import Link from "next/link";
+import JsonLd from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  title: "FAQs | UrbanCode Studio",
-  description: "Frequently asked questions about our web design services, pricing, timelines, and support. Get answers to common questions about working with UrbanCode Studio.",
+  title: "FAQs - Web Design Questions Answered",
+  description:
+    "Frequently asked questions about web design services, pricing, timelines, and support. Get answers about working with UrbanCode Studio — London's trade website specialist.",
+  keywords: [
+    "web design FAQ",
+    "website design questions",
+    "how long to build a website",
+    "website pricing questions",
+    "web design process",
+  ],
+  alternates: {
+    canonical: "/faqs",
+  },
+  openGraph: {
+    title: "FAQs | UrbanCode Studio",
+    description:
+      "Answers to common questions about web design services, pricing, and timelines.",
+    url: "/faqs",
+    type: "website",
+  },
 };
 
 export default function FAQsPage() {
@@ -60,8 +79,22 @@ export default function FAQsPage() {
     }
   ];
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+
   return (
     <PageLayout>
+      <JsonLd data={faqSchema} />
       <div className="bg-white">
         {/* Hero Section */}
         <div className="bg-gradient-to-b from-lightGrey to-white">
@@ -94,10 +127,10 @@ export default function FAQsPage() {
                 Can't find the answer you're looking for? Get in touch and we'll be happy to help.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/#contact" className="btn-primary">
+                <Link href="/contact" className="btn-primary">
                   Contact Us
                 </Link>
-                <Link href="/#contact" className="btn-secondary">
+                <Link href="/contact" className="btn-secondary">
                   Book Free Audit
                 </Link>
               </div>
