@@ -123,11 +123,11 @@ export default function Home() {
 
             <div className="hidden lg:flex items-center space-x-8">
               {[
-                { id: "services", label: "Services" },
-                { id: "pricing", label: "Pricing" },
-                { id: "portfolio", label: "Portfolio" },
-                { id: "reviews", label: "Reviews" },
-                { id: "contact", label: "Contact" },
+                { id: "services", label: "Services", href: "/services" },
+                { id: "pricing", label: "Pricing", href: "/pricing" },
+                { id: "portfolio", label: "Portfolio", href: "/portfolio" },
+                { id: "reviews", label: "Reviews", href: "/reviews" },
+                { id: "contact", label: "Contact", href: "/contact" },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -197,11 +197,11 @@ export default function Home() {
             {/* Mobile Menu Links */}
             <nav className="flex flex-col px-4">
               {[
-                { id: "services", label: "Services" },
-                { id: "pricing", label: "Pricing" },
-                { id: "portfolio", label: "Portfolio" },
-                { id: "reviews", label: "Reviews" },
-                { id: "contact", label: "Contact" },
+                { id: "services", label: "Services", href: "/services" },
+                { id: "pricing", label: "Pricing", href: "/pricing" },
+                { id: "portfolio", label: "Portfolio", href: "/portfolio" },
+                { id: "reviews", label: "Reviews", href: "/reviews" },
+                { id: "contact", label: "Contact", href: "/contact" },
               ].map((item) => (
                 <button
                   key={item.id}
@@ -601,60 +601,117 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Before & After comparison */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          {/* Before & After comparison — improved */}
+          <h3 className="text-2xl sm:text-3xl heading text-center mb-8">What Changes Look Like</h3>
+          <div className="grid md:grid-cols-2 gap-0 max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-xl">
             {/* Old Site */}
-            <div className="card bg-gray-100">
-              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-4">
-                <div className="text-xs text-gray-400 mb-2">Old Site &#x274C;</div>
-                <div className="space-y-2">
-                  <div className="h-2 bg-red-300 rounded w-full"></div>
-                  <div className="h-2 bg-red-300 rounded w-2/3"></div>
-                  <div className="flex gap-1">
-                    <div className="h-16 bg-red-200 rounded flex-1"></div>
-                    <div className="h-16 bg-red-200 rounded flex-1"></div>
-                    <div className="h-16 bg-red-200 rounded flex-1"></div>
-                  </div>
-                  <div className="h-1 bg-red-300 rounded w-1/2"></div>
-                  <div className="h-1 bg-red-300 rounded w-3/4"></div>
-                </div>
+            <div className="bg-gray-50 p-8 border-r border-gray-200">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
+                  <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </span>
+                <span className="text-lg font-bold text-gray-700">Before</span>
               </div>
-              <h3 className="text-xl font-bold text-gray-700 mb-3">Typical Problems:</h3>
-              <ul className="space-y-2 text-gray-600">
-                <li>&#x2717; Cluttered layout</li>
-                <li>&#x2717; Tiny text on mobile</li>
-                <li>&#x2717; No clear next steps</li>
-                <li>&#x2717; Slow loading times</li>
-              </ul>
-            </div>
-
-            {/* New Site */}
-            <div className="card bg-white">
-              <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-4">
-                <div className="text-xs text-gray-400 mb-2">New Site &#x2713;</div>
+              {/* Wireframe mockup */}
+              <div className="bg-white border-2 border-red-200 rounded-lg p-5 mb-6 shadow-inner">
                 <div className="space-y-3">
-                  <div className="h-3 bg-accent rounded w-1/2"></div>
-                  <div className="h-20 bg-gradient-to-br from-accent/20 to-primary/20 rounded"></div>
-                  <div className="flex gap-2">
-                    <div className="h-6 bg-accent rounded flex-1"></div>
-                    <div className="h-6 bg-gray-200 rounded flex-1"></div>
+                  <div className="flex gap-2 items-center mb-4">
+                    <div className="w-2 h-2 rounded-full bg-red-300" />
+                    <div className="w-2 h-2 rounded-full bg-red-300" />
+                    <div className="w-2 h-2 rounded-full bg-red-300" />
+                    <div className="h-2 bg-red-200 rounded flex-1 ml-2" />
                   </div>
-                  <div className="h-2 bg-gray-200 rounded w-full"></div>
-                  <div className="h-2 bg-gray-200 rounded w-4/5"></div>
+                  <div className="h-2.5 bg-red-200 rounded w-full" />
+                  <div className="h-2.5 bg-red-200 rounded w-2/3" />
+                  <div className="h-2 bg-red-100 rounded w-1/3 mt-1" />
+                  <div className="flex gap-2 mt-3">
+                    <div className="h-20 bg-red-100 rounded flex-1" />
+                    <div className="h-20 bg-red-100 rounded flex-1" />
+                    <div className="h-20 bg-red-100 rounded flex-1" />
+                  </div>
+                  <div className="h-2 bg-red-200 rounded w-1/2 mt-2" />
+                  <div className="h-2 bg-red-200 rounded w-3/4" />
+                  <div className="h-6 bg-red-200 rounded w-1/3 mt-3" />
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-primary mb-3">Our Solution:</h3>
-              <ul className="space-y-2 text-gray-700">
-                {["Clean, modern design", "Mobile-first approach", "Clear CTAs", "Lightning fast"].map((item, i) => (
-                  <li key={i} className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <ul className="space-y-3">
+                {[
+                  { text: "Cluttered, confusing layout", icon: "M6 18L18 6M6 6l12 12" },
+                  { text: "Tiny text on mobile screens", icon: "M6 18L18 6M6 6l12 12" },
+                  { text: "No clear call-to-action", icon: "M6 18L18 6M6 6l12 12" },
+                  { text: "5+ seconds to load", icon: "M6 18L18 6M6 6l12 12" },
+                  { text: "Not found on Google", icon: "M6 18L18 6M6 6l12 12" },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center text-gray-500">
+                    <svg className="w-5 h-5 text-red-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                     </svg>
-                    {item}
+                    <span>{item.text}</span>
                   </li>
                 ))}
               </ul>
             </div>
+
+            {/* New Site */}
+            <div className="bg-white p-8">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                <span className="text-lg font-bold text-primary">After</span>
+              </div>
+              {/* Wireframe mockup */}
+              <div className="bg-gradient-to-b from-blue-50 to-white border-2 border-green-200 rounded-lg p-5 mb-6 shadow-inner">
+                <div className="space-y-3">
+                  <div className="flex gap-2 items-center mb-4">
+                    <div className="w-2 h-2 rounded-full bg-green-300" />
+                    <div className="w-2 h-2 rounded-full bg-green-300" />
+                    <div className="w-2 h-2 rounded-full bg-green-300" />
+                    <div className="h-2 bg-accent/20 rounded flex-1 ml-2" />
+                  </div>
+                  <div className="h-4 bg-accent rounded w-2/3" />
+                  <div className="h-2 bg-gray-200 rounded w-5/6 mt-1" />
+                  <div className="h-28 bg-gradient-to-br from-accent/15 to-primary/10 rounded-lg mt-2 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-accent/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex gap-3 mt-3">
+                    <div className="h-8 bg-accent rounded-lg flex-1" />
+                    <div className="h-8 bg-gray-200 rounded-lg flex-1" />
+                  </div>
+                </div>
+              </div>
+              <ul className="space-y-3">
+                {[
+                  "Clean, conversion-focused design",
+                  "Perfect on every device",
+                  "Strong, visible CTAs",
+                  "Loads under 2 seconds",
+                  "SEO-optimised for local search",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center text-gray-700">
+                    <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link href="/portfolio" className="btn-primary inline-flex items-center">
+              View All Projects
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
@@ -834,19 +891,29 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <button onClick={() => scrollToSection("services")} className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/services" className="text-gray-300 hover:text-white transition-colors">
                     Services
-                  </button>
+                  </Link>
                 </li>
                 <li>
-                  <button onClick={() => scrollToSection("pricing")} className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">
                     Pricing
-                  </button>
+                  </Link>
                 </li>
                 <li>
-                  <button onClick={() => scrollToSection("contact")} className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
                     Contact
-                  </button>
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/portfolio" className="text-gray-300 hover:text-white transition-colors">
+                    Portfolio
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/reviews" className="text-gray-300 hover:text-white transition-colors">
+                    Reviews
+                  </Link>
                 </li>
                 <li>
                   <Link href="/about" className="text-gray-300 hover:text-white transition-colors">

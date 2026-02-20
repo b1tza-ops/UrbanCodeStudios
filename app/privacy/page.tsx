@@ -2,8 +2,16 @@ import { Metadata } from "next";
 import PageLayout from "@/components/PageLayout";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | UrbanCode Studio",
-  description: "Privacy policy for UrbanCode Studio. Learn how we collect, use, and protect your personal information in compliance with UK GDPR.",
+  title: "Privacy Policy",
+  description:
+    "Privacy policy for UrbanCode Studio. Learn how we collect, use, and protect your personal information in compliance with UK GDPR.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function PrivacyPage() {

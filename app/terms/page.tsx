@@ -2,8 +2,16 @@ import { Metadata } from "next";
 import PageLayout from "@/components/PageLayout";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | UrbanCode Studio",
-  description: "Terms and conditions for web design services provided by UrbanCode Studio. Read our service agreement, payment terms, and policies.",
+  title: "Terms of Service",
+  description:
+    "Terms and conditions for web design services provided by UrbanCode Studio. Read our service agreement, payment terms, and policies.",
+  alternates: {
+    canonical: "/terms",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function TermsPage() {

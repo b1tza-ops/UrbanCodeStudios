@@ -1,11 +1,32 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import JsonLd from "@/components/JsonLd";
 
 export const metadata: Metadata = {
-  title: "UrbanCode Studio | Web Design for London Trades & Local Businesses",
+  metadataBase: new URL("https://urbancodestudio.co.uk"),
+  title: {
+    default: "UrbanCode Studio | Web Design for London Trades & Local Businesses",
+    template: "%s | UrbanCode Studio",
+  },
   description: "Professional websites built for London trades and growing businesses. Fast, mobile-first design that brings you more local clients. Get your free audit today.",
-  keywords: ["web design london", "website design for trades", "local business websites", "plumber websites", "electrician websites", "builder websites"],
-  authors: [{ name: "UrbanCode Studio" }],
+  keywords: [
+    "web design london",
+    "website design for trades",
+    "local business websites",
+    "plumber websites",
+    "electrician websites",
+    "builder websites",
+    "affordable web design london",
+    "trade website design",
+    "small business website london",
+    "mobile friendly website design",
+  ],
+  authors: [{ name: "UrbanCode Studio", url: "https://urbancodestudio.co.uk" }],
+  creator: "UrbanCode Studio",
+  publisher: "UrbanCode Studio",
+  alternates: {
+    canonical: "/",
+  },
   robots: {
     index: true,
     follow: true,
@@ -19,7 +40,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "UrbanCode Studio | Web Design for London Trades",
-    description: "Websites that bring you more local clients. Built for London trades and growing businesses.",
+    description: "Professional websites from £299. Fast, mobile-first design that brings London trades and local businesses more customers.",
+    url: "/",
     type: "website",
     locale: "en_GB",
     siteName: "UrbanCode Studio",
@@ -27,8 +49,36 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "UrbanCode Studio | Web Design for London Trades",
-    description: "Websites that bring you more local clients. Built for London trades and growing businesses.",
+    description: "Professional websites from £299. Fast, mobile-first design for London trades and local businesses.",
   },
+  category: "technology",
+};
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "UrbanCode Studio",
+  description: "Professional web design agency for London trades and local businesses. Fast, mobile-first websites from £299.",
+  url: "https://urbancodestudio.co.uk",
+  email: "hello@urbancodestudio.com",
+  areaServed: {
+    "@type": "City",
+    name: "London",
+    containedInPlace: {
+      "@type": "Country",
+      name: "United Kingdom",
+    },
+  },
+  priceRange: "££",
+  serviceType: ["Web Design", "Local SEO", "Google Business Optimisation"],
+  knowsAbout: ["Web Development", "SEO", "Small Business Marketing", "Website Design"],
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.9",
+    reviewCount: "50",
+    bestRating: "5",
+  },
+  sameAs: [],
 };
 
 export default function RootLayout({
@@ -47,7 +97,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <JsonLd data={localBusinessSchema} />
+        {children}
+      </body>
     </html>
   );
 }

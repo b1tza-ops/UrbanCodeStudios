@@ -3,8 +3,25 @@ import PageLayout from "@/components/PageLayout";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "About Us | UrbanCode Studio",
-  description: "Learn about UrbanCode Studio - a London-based web design agency helping trades and local businesses grow online with affordable, high-quality websites.",
+  title: "About Us - London Web Design Agency for Trades",
+  description:
+    "UrbanCode Studio is a London-based web design agency specialising in helping trades and local businesses grow online with affordable, high-quality websites from £299.",
+  keywords: [
+    "about urbancode studio",
+    "london web design agency",
+    "trade website specialist",
+    "local business web designer london",
+  ],
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "About UrbanCode Studio | London Web Design Agency",
+    description:
+      "Helping London trades and local businesses grow online with affordable, high-quality websites.",
+    url: "/about",
+    type: "website",
+  },
 };
 
 export default function AboutPage() {
@@ -210,7 +227,7 @@ export default function AboutPage() {
               Book a free consultation and website audit today.
             </p>
             <Link 
-              href="/#contact"
+              href="/contact"
               className="inline-block bg-white text-primary px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl"
             >
               Get Your Free Audit
