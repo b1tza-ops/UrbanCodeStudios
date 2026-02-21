@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { sendTelegramNotification } from "@/lib/telegram";
 
 // Simple server-side rate tracking for form submissions
 const formSubmissions = new Map<
@@ -123,14 +125,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Send email notification or store in database
-    // Log submission without PII for GDPR compliance
-    console.log("New contact form submission:", {
+    // Store lead in database
+    const lead = await prisma.lead.create({
+      data: {
+        name: sanitizedData.name,
+        email: sanitizedData.email,
+        phone: sanitizedData.phone,
+        company: sanitizedData.business,
+        source: "website",
+        status: "NEW",
+      },
+    });
+
+    // Send Telegram notification (non-blocking)
+    sendTelegramNotification(
+      `<b>New Lead from Website</b>\n\n` +
+        `<b>Name:</b> ${sanitizedData.name}\n` +
+        `<b>Business:</b> ${sanitizedData.business}\n` +
+        `<b>Email:</b> ${sanitizedData.email}\n` +
+        `<b>Phone:</b> ${sanitizedData.phone}\n` +
+        `<b>Message:</b> ${sanitizedData.message || "No message"}\n\n` +
+        `<b>Lead ID:</b> ${lead.id}`
+    ).catch(() => {});
+
+    // Log without PII for GDPR compliance
+    console.log("New lead created:", {
+      leadId: lead.id,
       timestamp: new Date().toISOString(),
-      hasName: !!sanitizedData.name,
-      hasEmail: !!sanitizedData.email,
-      hasPhone: !!sanitizedData.phone,
-      hasMessage: !!sanitizedData.message,
     });
 
     return NextResponse.json({

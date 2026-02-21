@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SALES
+  VIEWER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  WON
+  LOST
+}
+
+enum TaskStatus {
+  OPEN
+  DONE
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         Role       @default(VIEWER)
+  createdAt    DateTime   @default(now())
+  lastLoginAt  DateTime?
+  leads        Lead[]     @relation("LeadOwner")
+  notes        LeadNote[]
+  tasks        Task[]     @relation("TaskAssignee")
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Lead {
+  id           String     @id @default(cuid())
+  name         String
+  email        String?
+  phone        String?
+  company      String?
+  website      String?
+  businessType String?
+  source       String     @default("website")
+  status       LeadStatus @default(NEW)
+  ownerId      String?
+  owner        User?      @relation("LeadOwner", fields: [ownerId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  notes        LeadNote[]
+  tasks        Task[]
+
+  @@map("leads")
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  note      String
+  createdAt DateTime @default(now())
+
+  @@map("lead_notes")
+}
+
+model Task {
+  id           String     @id @default(cuid())
+  leadId       String?
+  lead         Lead?      @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  assignedToId String
+  assignedTo   User       @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  title        String
+  dueAt        DateTime
+  status       TaskStatus @default(OPEN)
+  createdAt    DateTime   @default(now())
+
+  @@map("tasks")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  beforeJson Json?
+  afterJson  Json?
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 // Simple in-memory rate limiter
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -6,6 +7,7 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS = 60; // max requests per window
 const FORM_MAX_REQUESTS = 5; // max form submissions per window
+const LOGIN_MAX_REQUESTS = 5; // max login attempts per window
 
 function getClientIp(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for");
@@ -38,12 +40,23 @@ if (typeof setInterval !== "undefined") {
   }, 60000);
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const ip = getClientIp(request);
   const path = request.nextUrl.pathname;
 
-  // Stricter rate limiting for form/API endpoints
-  if (path.startsWith("/api/")) {
+  // Rate limit login / auth endpoints (brute-force protection)
+  if (path.startsWith("/api/auth")) {
+    const loginKey = `login:${ip}`;
+    if (isRateLimited(loginKey, LOGIN_MAX_REQUESTS)) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+  }
+
+  // Stricter rate limiting for form/API endpoints (excluding auth)
+  if (path.startsWith("/api/") && !path.startsWith("/api/auth")) {
     const formKey = `form:${ip}`;
     if (isRateLimited(formKey, FORM_MAX_REQUESTS)) {
       return NextResponse.json(
@@ -57,6 +70,30 @@ export function middleware(request: NextRequest) {
   const generalKey = `general:${ip}`;
   if (isRateLimited(generalKey, MAX_REQUESTS)) {
     return new NextResponse("Too Many Requests", { status: 429 });
+  }
+
+  // Redirect authenticated users away from login page
+  if (path === "/admin/login") {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (token) {
+      return NextResponse.redirect(new URL("/admin/leads", request.url));
+    }
+  }
+
+  // Auth protection for /admin routes (except login page)
+  if (path.startsWith("/admin") && path !== "/admin/login") {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (!token) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+  }
+
+  // Auth protection for /api/admin/* routes
+  if (path.startsWith("/api/admin")) {
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   }
 
   const response = NextResponse.next();
