@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
+import { useSession } from "next-auth/react";
 import { loginAction } from "./actions";
 
 function SubmitButton() {
@@ -18,13 +19,14 @@ function SubmitButton() {
 }
 
 export default function LoginPage() {
+  const { data: session } = useSession();
   const [state, formAction] = useActionState(loginAction, null);
 
   useEffect(() => {
-    if (state?.success) {
+    if (state?.success || session) {
       window.location.href = "/admin/leads";
     }
-  }, [state]);
+  }, [state, session]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
