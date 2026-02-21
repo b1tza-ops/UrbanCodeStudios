@@ -36,6 +36,27 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
+  // Scroll-reveal animation observer
+  useEffect(() => {
+    const revealElements = document.querySelectorAll(".reveal, .reveal-left, .reveal-right, .reveal-scale, .heading-underline");
+    
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
+    );
+
+    revealElements.forEach((el) => revealObserver.observe(el));
+
+    return () => revealObserver.disconnect();
+  }, []);
+
   const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -227,7 +248,7 @@ export default function Home() {
       <section id="hero" className="relative bg-gradient-to-b from-lightGrey to-white overflow-hidden">
         <div className="section-container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+            <div className="space-y-6 reveal-left">
               <div className="inline-flex items-center px-4 py-2 bg-accent/10 rounded-full text-accent text-sm font-semibold">
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -275,7 +296,7 @@ export default function Home() {
             </div>
 
             {/* Hero Image */}
-            <div className="relative">
+            <div className="relative reveal-right">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop"
@@ -288,7 +309,7 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent" />
               </div>
               {/* Floating stats card */}
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-xl p-4 hidden md:block">
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-xl shadow-xl p-4 hidden md:block animate-float">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -302,7 +323,7 @@ export default function Home() {
                 </div>
               </div>
               {/* Floating speed card */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-xl p-4 hidden md:block">
+              <div className="absolute -top-4 -right-4 bg-white rounded-xl shadow-xl p-4 hidden md:block animate-float" style={{ animationDelay: '1.5s' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
                     <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -326,7 +347,7 @@ export default function Home() {
       {/* Problem Section */}
       <section id="problem" className="bg-white">
         <div className="section-container">
-          <h2 className="text-3xl sm:text-4xl heading text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl heading text-center mb-12 reveal heading-underline">
             Why Most Local Business Websites Don't Convert
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -368,24 +389,24 @@ export default function Home() {
                 description: "Nobody can find you in search results",
               },
             ].map((item, index) => (
-              <div key={index} className="card text-center">
+              <div key={index} className={`card text-center hover-lift reveal stagger-${index + 1}`}>
                 <div className="flex justify-center mb-4">{item.icon}</div>
                 <h3 className="text-xl font-semibold text-primary mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.description}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-2xl font-semibold text-primary">We fix all of that.</p>
+          <p className="text-center text-2xl font-semibold text-primary reveal">We fix all of that.</p>
         </div>
       </section>
 
       {/* Services Section */}
       <section id="services" className="bg-lightGrey">
         <div className="section-container">
-          <h2 className="text-3xl sm:text-4xl heading text-center mb-4">
+          <h2 className="text-3xl sm:text-4xl heading text-center mb-4 reveal heading-underline">
             What We Do
           </h2>
-          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto reveal stagger-1">
             Everything your business needs to stand out online and attract more local customers.
           </p>
           <div className="grid md:grid-cols-3 gap-8">
@@ -424,7 +445,7 @@ export default function Home() {
                 ],
               },
             ].map((service, index) => (
-              <div key={index} className="card overflow-hidden group">
+              <div key={index} className={`card overflow-hidden group hover-lift reveal stagger-${index + 1}`}>
                 <div className="relative h-48 -mx-6 -mt-6 mb-6 overflow-hidden">
                   <Image
                     src={service.image}

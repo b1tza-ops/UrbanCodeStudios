@@ -28,6 +28,25 @@ function validatePhone(phone: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    // CSRF protection: verify request origin
+    const origin = request.headers.get("origin");
+    const referer = request.headers.get("referer");
+    const allowedOrigins = [
+      "https://urbancodestudios.com",
+      "https://www.urbancodestudios.com",
+    ];
+    // In development, also allow localhost
+    if (process.env.NODE_ENV === "development") {
+      allowedOrigins.push("http://localhost:3000");
+    }
+    const requestOrigin = origin || (referer ? new URL(referer).origin : null);
+    if (!requestOrigin || !allowedOrigins.includes(requestOrigin)) {
+      return NextResponse.json(
+        { error: "Forbidden: invalid origin." },
+        { status: 403 }
+      );
+    }
+
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||
@@ -105,11 +124,13 @@ export async function POST(request: NextRequest) {
     }
 
     // TODO: Send email notification or store in database
-    // For now, log the submission (replace with your integration)
+    // Log submission without PII for GDPR compliance
     console.log("New contact form submission:", {
-      ...sanitizedData,
       timestamp: new Date().toISOString(),
-      ip,
+      hasName: !!sanitizedData.name,
+      hasEmail: !!sanitizedData.email,
+      hasPhone: !!sanitizedData.phone,
+      hasMessage: !!sanitizedData.message,
     });
 
     return NextResponse.json({
