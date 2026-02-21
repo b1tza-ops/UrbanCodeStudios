@@ -21,9 +21,13 @@ export default function LoginPage() {
         email,
         password,
         redirect: false,
+        callbackUrl: "/admin/leads",
       });
 
-      if (result?.error) {
+      if (result?.url) {
+        router.push(result.url);
+        router.refresh();
+      } else if (result?.error) {
         setError("Invalid email or password.");
       } else {
         router.push("/admin/leads");
