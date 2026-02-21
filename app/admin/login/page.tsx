@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { loginAction } from "./actions";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -17,24 +15,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-        callbackUrl: "/admin/leads",
-      });
-
-      if (result?.url) {
-        router.push(result.url);
-        router.refresh();
-      } else if (result?.error) {
-        setError("Invalid email or password.");
-      } else {
-        router.push("/admin/leads");
-        router.refresh();
+      const result = await loginAction(email, password);
+      if (result?.error) {
+        setError(result.error);
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      // signIn redirects on success by throwing NEXT_REDIRECT
+      // If we get here without a redirect, something went wrong
     } finally {
       setLoading(false);
     }
