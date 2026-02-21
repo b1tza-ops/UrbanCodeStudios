@@ -1,31 +1,24 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { loginAction } from "./actions";
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+    >
+      {pending ? "Signing in..." : "Sign In"}
+    </button>
+  );
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      const result = await loginAction(email, password);
-      if (result?.error) {
-        setError(result.error);
-      }
-    } catch {
-      // signIn redirects on success by throwing NEXT_REDIRECT
-      // If we get here without a redirect, something went wrong
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [state, formAction] = useActionState(loginAction, null);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -36,13 +29,13 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-2">Sign in to your account</p>
           </div>
 
-          {error && (
+          {state?.error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {error}
+              {state.error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form action={formAction} className="space-y-5">
             <div>
               <label
                 htmlFor="email"
@@ -52,9 +45,8 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
                 placeholder="admin@urbancodestudios.com"
@@ -70,22 +62,15 @@ export default function LoginPage() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent outline-none transition-all"
                 placeholder="••••••••"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
+            <SubmitButton />
           </form>
         </div>
       </div>
