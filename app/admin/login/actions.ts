@@ -4,7 +4,7 @@ import { signIn } from "@/lib/auth";
 import { AuthError } from "next-auth";
 
 export async function loginAction(
-  _prevState: { error: string } | null | undefined,
+  _prevState: { error?: string; success?: boolean } | null | undefined,
   formData: FormData
 ) {
   const email = formData.get("email") as string;
@@ -14,13 +14,14 @@ export async function loginAction(
     await signIn("credentials", {
       email,
       password,
-      redirectTo: "/admin/leads",
+      redirect: false,
     });
+    return { success: true };
   } catch (error) {
     if (error instanceof AuthError) {
       return { error: "Invalid email or password." };
     }
-    // signIn throws NEXT_REDIRECT on success — rethrow it
-    throw error;
+    console.error("[login] Unexpected error:", error);
+    return { error: "Something went wrong. Please try again." };
   }
 }

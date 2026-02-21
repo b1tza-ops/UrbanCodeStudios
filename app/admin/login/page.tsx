@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { loginAction } from "./actions";
 
@@ -19,6 +19,12 @@ function SubmitButton() {
 
 export default function LoginPage() {
   const [state, formAction] = useActionState(loginAction, null);
+
+  useEffect(() => {
+    if (state?.success) {
+      window.location.href = "/admin/leads";
+    }
+  }, [state]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
